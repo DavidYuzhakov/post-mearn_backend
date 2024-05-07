@@ -8,7 +8,7 @@ import { checkAuth, validationErrors } from "./utils/index.js"
 import {UserController, PostController, CommentsController} from "./controllers/index.js"
 
 mongoose
-  .connect('mongodb+srv://admin:ddddd@cluster0.gzvdawi.mongodb.net/blog?retryWrites=true&w=majority&appName=Cluster0')
+  .connect(process.env.MONGODB_URI)
   .then(() => console.log('DB ok'))
   .catch(err => console.log('DB error', err))
 
@@ -63,6 +63,6 @@ app.patch('/comments/:id', checkAuth, commentsValidation, validationErrors, Comm
 app.listen(process.env.PORT || 4444, (err) => {
   if (err) console.log(err)
 
-  console.log('Server OK')
+  console.log('Server OK on')
 })
 
