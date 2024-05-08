@@ -8,6 +8,7 @@ import { registerValidation, loginValidation, postCreateValidation, commentsVali
 import { checkAuth, validationErrors } from "./utils/index.js"
 import {UserController, PostController, CommentsController} from "./controllers/index.js"
 
+
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => console.log('DB ok'))
@@ -18,7 +19,7 @@ const app = express()
 const storage = multer.diskStorage({
   destination: (req, file, cb) => { // куда сохранять картинки (в папку uploads)
     if (!fs.existsSync('uploads')) {
-      fs.mkdir('uploads')
+      fs.mkdirSync('uploads') // если будет mkdir - ассинхронно то не вызовится cb в любом случае
     }
     cb(null, 'uploads')
   },
@@ -42,7 +43,6 @@ app.post('/upload', checkAuth, upload.single('image'), (req, res) => { //ожи�
     url: `/uploads/${req.file.originalname}`
   })
 })
-
 app.post('/upload/avatar', upload.single('icon'), (req, res) => {
   res.json({
     url: `/uploads/${req.file.originalname}`
@@ -64,9 +64,10 @@ app.post('/comments/:id', checkAuth, commentsValidation, validationErrors, Comme
 app.delete('/comments/:id', checkAuth, CommentsController.remove)
 app.patch('/comments/:id', checkAuth, commentsValidation, validationErrors, CommentsController.edit)
 
-app.listen(process.env.PORT || 4444, (err) => {
+const port = process.env.PORT || 4444
+app.listen(port, (err) => {
   if (err) console.log(err)
 
-  console.log('Server OK on', process.env.PORT || 4444)
+  console.log(`Server OK on ${port} port`)
 })
 
