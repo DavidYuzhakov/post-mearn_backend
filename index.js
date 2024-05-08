@@ -1,5 +1,6 @@
 import express from "express"
 import mongoose from "mongoose"
+import fs from "fs"
 import multer from "multer"
 import cors from "cors"
 
@@ -16,6 +17,9 @@ const app = express()
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => { // куда сохранять картинки (в папку uploads)
+    if (!fs.existsSync('uploads')) {
+      fs.mkdir('uploads')
+    }
     cb(null, 'uploads')
   },
   filename: (req, file, cb) => { // как будет называться файл
@@ -63,6 +67,6 @@ app.patch('/comments/:id', checkAuth, commentsValidation, validationErrors, Comm
 app.listen(process.env.PORT || 4444, (err) => {
   if (err) console.log(err)
 
-  console.log('Server OK on')
+  console.log('Server OK on', process.env.PORT || 4444)
 })
 
