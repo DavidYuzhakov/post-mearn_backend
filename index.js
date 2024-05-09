@@ -3,11 +3,17 @@ import mongoose from "mongoose"
 import fs from "fs"
 import multer from "multer"
 import cors from "cors"
+import cloudinary from "cloudinary"
 
 import { registerValidation, loginValidation, postCreateValidation, commentsValidation } from './validations.js'
 import { checkAuth, validationErrors } from "./utils/index.js"
 import {UserController, PostController, CommentsController} from "./controllers/index.js"
 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+})
 
 mongoose
   .connect(process.env.MONGODB_URI)
@@ -38,15 +44,27 @@ app.post('/auth/login', loginValidation, validationErrors, UserController.login)
 app.post('/auth/register', registerValidation, validationErrors, UserController.register)
 app.get('/auth/me', checkAuth, UserController.getMe)
 
-app.post('/upload', checkAuth, upload.single('image'), (req, res) => { //ожидаем св-во image с какой-то картинкой
-  res.json({
-    url: `/uploads/${req.file.originalname}`
-  })
+app.post('/upload', checkAuth, upload.single('image'), async (req, res) => { //ожидаем св-во image с какой-то картинкой
+  try {
+    const { secure_url } = await cloudinary.uploader.upload(req.file.originalname)
+    res.json({ url: secure_url })
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({
+      message: 'Failed to upload image to Cloudinary'
+    })
+  }
 })
-app.post('/upload/avatar', upload.single('icon'), (req, res) => {
-  res.json({
-    url: `/uploads/${req.file.originalname}`
-  })
+app.post('/upload/avatar', upload.single('icon'), async (req, res) => {
+  try {
+    const { secure_url } = await cloudinary.uploader.upload(req.file.originalname)
+    res.json({ url: secure_url })
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({
+      message: 'Failed to upload icon to Cloudinary'
+    })
+  }
 })
 
 app.get('/posts', PostController.getAll)
