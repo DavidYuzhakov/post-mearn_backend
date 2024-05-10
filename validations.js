@@ -13,8 +13,8 @@ export const registerValidation = [
 ]
 
 export const postCreateValidation = [
-  body('title', 'Enter the title of the post').isLength({ min: 2 }).isString(),
-  body('text', 'Enter the text of the post').isLength({ min: 2 }).isString(),
+  body('title', 'Enter the title of the post (min length 2 of simbols)').isLength({ min: 2 }).isString(),
+  body('text', 'Enter the text of the post (min length 10 of simbols)').isLength({ min: 10 }).isString(),
   body('tags', 'Invalid format of tags').isString().optional(),
   body('imageUrl', 'Invalid image URL').optional().isString(),
 ]
