@@ -57,7 +57,7 @@ app.post('/upload', checkAuth, upload.single('image'), async (req, res) => { //Ð
 })
 app.post('/upload/avatar', upload.single('icon'), async (req, res) => {
   try {
-    const { secure_url } = await cloudinary.uploader.upload(req.file.originalname)
+    const { secure_url } = await cloudinary.uploader.upload(req.file.path)
     res.json({ url: secure_url })
   } catch (err) {
     console.log(err)
